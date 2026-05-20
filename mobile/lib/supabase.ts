@@ -92,6 +92,13 @@ export async function getProfile() {
   }
 }
 
+export function getLocalDateString() {
+  const d = new Date()
+  const offset = d.getTimezoneOffset()
+  const localDate = new Date(d.getTime() - (offset * 60 * 1000))
+  return localDate.toISOString().split('T')[0]
+}
+
 // ── Food log helpers ──────────────────────────────────────────
 
 export async function logFood(entry: {
@@ -101,13 +108,13 @@ export async function logFood(entry: {
 }) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
-  return supabase.from('food_logs').insert({ user_id: user.id, date: new Date().toISOString().split('T')[0], ...entry })
+  return supabase.from('food_logs').insert({ user_id: user.id, date: getLocalDateString(), ...entry })
 }
 
 export async function getTodayFoodLogs() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   const { data } = await supabase.from('food_logs').select('*').eq('user_id', user.id).eq('date', today).order('created_at')
   return data || []
 }

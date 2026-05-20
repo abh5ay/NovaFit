@@ -5,7 +5,7 @@
 
 import { useEffect, useCallback } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { supabase } from './supabase'
+import { supabase, getLocalDateString } from './supabase'
 
 // ── Pull all user data from Supabase and store locally ──────────
 export async function syncFromSupabase(): Promise<void> {
@@ -91,7 +91,7 @@ export async function savePantry(items: string[]): Promise<void> {
 
 // ── Record a day completion → update level + streak ─────────────
 export async function recordDayComplete(tasksDone: number, tasksTotal: number): Promise<{level:number; streak:number}> {
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   const levelRaw  = await AsyncStorage.getItem('user_level')
   const streakRaw = await AsyncStorage.getItem('user_streak')
   const lastDateRaw = await AsyncStorage.getItem('last_level_date')

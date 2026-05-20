@@ -35,6 +35,11 @@ export default function ChatScreen() {
     AsyncStorage.getItem('schedule_config').then(s => { if (s) setScheduleConfig(JSON.parse(s)) })
     AsyncStorage.getItem('workout_plan').then(w => { if (w) setWorkoutPlan(JSON.parse(w)) })
     AsyncStorage.getItem('meal_plan').then(m => { if (m) setMealPlan(JSON.parse(m)) })
+    
+    // Load persisted chat history
+    AsyncStorage.getItem('chat_history').then(h => {
+      if (h) setMessages(JSON.parse(h))
+    })
   }, [])
 
   useEffect(() => {
@@ -49,6 +54,7 @@ export default function ChatScreen() {
     const userMsg: ChatMessage = { role: 'user', content: msg }
     const history = [...messages, userMsg]
     setMessages(history)
+    await AsyncStorage.setItem('chat_history', JSON.stringify(history))
     setLoading(true)
 
     try {
@@ -61,7 +67,9 @@ export default function ChatScreen() {
         currentMealPlan: mealPlan,
       } as any)
       const aiMsg: ChatMessage = { role: 'assistant', content: res.reply }
-      setMessages([...history, aiMsg])
+      const newHistory = [...history, aiMsg]
+      setMessages(newHistory)
+      await AsyncStorage.setItem('chat_history', JSON.stringify(newHistory))
 
       // Save updated plans/schedule to AsyncStorage AND Supabase
       if ((res as any).workoutUpdate) {
@@ -91,7 +99,9 @@ export default function ChatScreen() {
         }
       }
     } catch (e: any) {
-      setMessages([...history, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment." }])
+      const errHistory = [...history, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment." }]
+      setMessages(errHistory)
+      await AsyncStorage.setItem('chat_history', JSON.stringify(errHistory))
     }
     setLoading(false)
   }
