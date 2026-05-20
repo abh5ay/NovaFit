@@ -1,7 +1,11 @@
 // mobile/lib/api.ts
 // All backend API calls — single source of truth
 
-const BASE = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+let rawBase = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+if (rawBase.endsWith('/')) {
+  rawBase = rawBase.slice(0, -1)
+}
+const BASE = rawBase
 
 // Wake up Render free tier on app launch
 export async function wakeUpServer(): Promise<void> {
