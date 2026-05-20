@@ -31,13 +31,45 @@ export default function SignupScreen() {
 
         <View style={s.form}>
           <Text style={s.label}>Full Name</Text>
-          <TextInput style={s.input} value={name} onChangeText={setName} placeholder="John Doe" placeholderTextColor="#555" />
+          <TextInput
+            style={s.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="John Doe"
+            placeholderTextColor="#555"
+            textContentType="name"
+            autoComplete="name"
+            importantForAutofill="yes"
+          />
 
           <Text style={s.label}>Email</Text>
-          <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor="#555" autoCapitalize="none" keyboardType="email-address" />
+          <TextInput
+            style={s.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            placeholderTextColor="#555"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            autoComplete="email"
+            importantForAutofill="yes"
+            autoCorrect={false}
+          />
 
           <Text style={s.label}>Password</Text>
-          <TextInput style={s.input} value={password} onChangeText={setPassword} placeholder="••••••••" placeholderTextColor="#555" secureTextEntry />
+          <TextInput
+            style={s.input}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="••••••••"
+            placeholderTextColor="#555"
+            secureTextEntry
+            textContentType="password"
+            autoComplete="new-password"
+            importantForAutofill="yes"
+            autoCorrect={false}
+          />
 
           <TouchableOpacity style={s.btn} onPress={handleSignup} disabled={loading}>
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>Create Account →</Text>}

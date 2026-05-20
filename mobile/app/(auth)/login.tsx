@@ -39,6 +39,10 @@ export default function LoginScreen() {
             placeholderTextColor="#555"
             autoCapitalize="none"
             keyboardType="email-address"
+            textContentType="emailAddress"
+            autoComplete="email"
+            importantForAutofill="yes"
+            autoCorrect={false}
           />
 
           <Text style={s.label}>Password</Text>
@@ -49,6 +53,10 @@ export default function LoginScreen() {
             placeholder="••••••••"
             placeholderTextColor="#555"
             secureTextEntry
+            textContentType="password"
+            autoComplete="current-password"
+            importantForAutofill="yes"
+            autoCorrect={false}
           />
 
           <TouchableOpacity style={s.btn} onPress={handleLogin} disabled={loading}>

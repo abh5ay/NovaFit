@@ -50,7 +50,7 @@ function buildSchedule(workoutPlan:any, mealPlan:any, today:string, T:Times): Ta
       const t = T[tKey] || T.lunch_time
       tasks.push({
         id:`meal-${i}`, type:'meal', time:t,
-        title: m.name || (m.type?.charAt(0).toUpperCase() + m.type?.slice(1)) || 'Meal',
+        title: m.name || (m.type ? (m.type.charAt(0).toUpperCase() + m.type.slice(1)) : 'Meal'),
         subtitle: m.ingredients?.slice(0,2).join(', ') || `${m.calories||0} kcal`,
         calories: m.calories, done:false,
         accent: m.type==='breakfast'?'#F59E0B':m.type==='lunch'?'#10B981':m.type==='dinner'?'#7C5CFC':'#3B82F6',

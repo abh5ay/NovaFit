@@ -219,7 +219,7 @@ export default function HomeScreen() {
           <View style={s.statsRow}>
             {[
               { label: 'Goal', value: profile.goal === 'lose' ? 'Fat Loss' : profile.goal === 'gain' ? 'Muscle Gain' : 'Maintain' },
-              { label: 'Activity', value: profile.activity?.charAt(0).toUpperCase() + profile.activity?.slice(1) || '-' },
+              { label: 'Activity', value: profile.activity ? (profile.activity.charAt(0).toUpperCase() + profile.activity.slice(1)) : '-' },
               { label: 'Target', value: `${targets.calories} kcal` },
             ].map((st, i) => (
               <View key={i} style={s.statBox}>
