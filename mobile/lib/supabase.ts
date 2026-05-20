@@ -2,12 +2,37 @@
 import { createClient } from '@supabase/supabase-js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://lztosaphsncbtivhcrsv.supabase.co'
+const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
+
+// Bulletproof storage adapter for iOS Safari (Private Browsing blocks localStorage/AsyncStorage completely)
+const safeStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      return await AsyncStorage.getItem(key)
+    } catch {
+      return null
+    }
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(key, value)
+    } catch {
+      // Fail silently
+    }
+  },
+  removeItem: async (key: string): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(key)
+    } catch {
+      // Fail silently
+    }
+  }
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    storage:          AsyncStorage,
+    storage:          safeStorage,
     autoRefreshToken: true,
     persistSession:   true,
     detectSessionInUrl: false
