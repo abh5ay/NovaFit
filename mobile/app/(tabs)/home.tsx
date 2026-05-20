@@ -9,13 +9,14 @@ import Svg, { Circle } from 'react-native-svg'
 
 function CalorieDonut({ consumed, target }: { consumed: number; target: number }) {
   const R = 54, stroke = 10, circ = 2 * Math.PI * R
-  const pct = Math.min(consumed / (target || 1), 1)
+  const pct = target > 0 ? Math.min(consumed / target, 1) : 0
+  const strokeDash = circ * pct
   const color = pct < 0.75 ? '#7C5CFC' : pct < 0.95 ? '#F59E0B' : '#EF4444'
   return (
     <Svg width={130} height={130} style={{ transform: [{ rotate: '-90deg' }] }}>
       <Circle cx={65} cy={65} r={R} stroke="#1E1E2A" strokeWidth={stroke} fill="none" />
       <Circle cx={65} cy={65} r={R} stroke={color} strokeWidth={stroke} fill="none"
-        strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
+        strokeDasharray={`${strokeDash} ${circ}`}
         strokeLinecap="round" />
     </Svg>
   )
@@ -51,8 +52,12 @@ export default function HomeScreen() {
           carbs:    acc.carbs    + (l.carbs     || 0),
           fat:      acc.fat      + (l.fat       || 0),
         }), { calories: 0, protein: 0, carbs: 0, fat: 0 }))
+      } else {
+        setConsumed({ calories: 0, protein: 0, carbs: 0, fat: 0 })
       }
-    } catch {}
+    } catch {
+      setConsumed({ calories: 0, protein: 0, carbs: 0, fat: 0 })
+    }
 
     // Load gamification data
     try {
