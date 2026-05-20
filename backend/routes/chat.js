@@ -135,7 +135,7 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
     const planMatch = text.match(/<plan_update>([\s\S]*?)<\/plan_update>/)
     if (planMatch) {
       try {
-        workoutUpdate = JSON.parse(planMatch[1].trim())
+        workoutUpdate = extractJSON(planMatch[1])
         reply = text.replace(/<plan_update>[\s\S]*?<\/plan_update>/, '').trim()
       } catch { /* keep reply as-is */ }
     }
@@ -143,7 +143,7 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
     const mealMatch = text.match(/<meal_update>([\s\S]*?)<\/meal_update>/)
     if (mealMatch) {
       try {
-        mealUpdate = JSON.parse(mealMatch[1].trim())
+        mealUpdate = extractJSON(mealMatch[1])
         reply = reply.replace(/<meal_update>[\s\S]*?<\/meal_update>/, '').trim()
       } catch { /* keep reply as-is */ }
     }
@@ -151,7 +151,7 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
     const schedMatch = text.match(/<schedule_update>([\s\S]*?)<\/schedule_update>/)
     if (schedMatch) {
       try {
-        scheduleUpdate = JSON.parse(schedMatch[1].trim())
+        scheduleUpdate = extractJSON(schedMatch[1])
         reply = reply.replace(/<schedule_update>[\s\S]*?<\/schedule_update>/, '').trim()
       } catch { /* keep reply as-is */ }
     }
@@ -160,7 +160,7 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
     const pantryMatch = text.match(/<pantry_update>([\s\S]*?)<\/pantry_update>/)
     if (pantryMatch) {
       try {
-        pantryUpdate = JSON.parse(pantryMatch[1].trim())
+        pantryUpdate = extractJSON(pantryMatch[1])
         reply = reply.replace(/<pantry_update>[\s\S]*?<\/pantry_update>/, '').trim()
       } catch { /* keep reply as-is */ }
     }
@@ -169,7 +169,7 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
     const foodMatch = text.match(/<food_log>([\s\S]*?)<\/food_log>/)
     if (foodMatch) {
       try {
-        foodLog = JSON.parse(foodMatch[1].trim())
+        foodLog = extractJSON(foodMatch[1])
         reply = reply.replace(/<food_log>[\s\S]*?<\/food_log>/, '').trim()
       } catch { /* keep reply as-is */ }
     }
