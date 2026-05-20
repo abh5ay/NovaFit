@@ -7,12 +7,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
 
 // ── Request permission ──────────────────────────────────────────
-export async function requestNotificationPermission(): Promise<boolean> {
+export async function requestNotificationPermission(force: boolean = false): Promise<boolean> {
   if (Platform.OS === 'web') {
     if (!('Notification' in window)) return false
     if (Notification.permission === 'granted') return true
-    const perm = await Notification.requestPermission()
-    return perm === 'granted'
+    if (!force) return false // Do NOT auto-prompt on launch (avoids user gesture security exception in Safari iOS)
+    try {
+      const perm = await Notification.requestPermission()
+      return perm === 'granted'
+    } catch { return false }
   }
   // Native
   try {
@@ -115,6 +118,6 @@ export async function scheduleTaskNotifications(): Promise<void> {
 
 // ── One-off: send test notification ────────────────────────────
 export async function sendTestNotification(): Promise<void> {
-  const granted = await requestNotificationPermission()
+  const granted = await requestNotificationPermission(true)
   if (granted) webNotify('🏋️ NovaFit', "Notifications are working! You'll be reminded about your daily tasks.")
 }
