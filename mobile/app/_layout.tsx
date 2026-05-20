@@ -46,7 +46,7 @@ export default function RootLayout() {
 
     if (!session && inTabsGroup) {
       router.replace('/(auth)/login')
-    } else if (session && !inAuthGroup && !inTabsGroup) {
+    } else if (session && !inTabsGroup) {
       router.replace('/(tabs)/home')
     }
   }, [session, loading, segments])
