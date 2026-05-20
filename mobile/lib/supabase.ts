@@ -1,6 +1,8 @@
 // mobile/lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as WebBrowser from 'expo-web-browser'
+import * as Linking from 'expo-linking'
 
 const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://lztosaphsncbtivhcrsv.supabase.co'
 const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -146,4 +148,20 @@ export async function saveBodyScan(scan: { estimated_bf_pct: number; bf_range: s
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
   return supabase.from('body_scans').insert({ user_id: user.id, ...scan })
+}
+
+// ── Google OAuth Sign-in ──────────────────────────────────────
+
+WebBrowser.maybeCompleteAuthSession()
+
+export async function signInWithGoogle() {
+  const redirectUrl = Linking.createURL('/(tabs)/home')
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectUrl,
+      skipBrowserRedirect: false,
+    },
+  })
+  return { data, error }
 }

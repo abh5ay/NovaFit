@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView, Platform, Alert, ActivityIndicator
 } from 'react-native'
 import { router } from 'expo-router'
-import { signIn } from '../../lib/supabase'
+import { signIn, signInWithGoogle } from '../../lib/supabase'
 
 export default function LoginScreen() {
   const [email, setEmail]       = useState('')
@@ -19,6 +19,13 @@ export default function LoginScreen() {
     setLoading(false)
     if (error) Alert.alert('Login Failed', error.message)
     else router.replace('/(tabs)/home')
+  }
+
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+    const { error } = await signInWithGoogle()
+    setLoading(false)
+    if (error) Alert.alert('Google Sign-In Failed', error.message)
   }
 
   return (
@@ -63,6 +70,16 @@ export default function LoginScreen() {
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>Log In</Text>}
           </TouchableOpacity>
 
+          <View style={s.dividerContainer}>
+            <View style={s.dividerLine} />
+            <Text style={s.dividerText}>or</Text>
+            <View style={s.dividerLine} />
+          </View>
+
+          <TouchableOpacity style={s.googleBtn} onPress={handleGoogleLogin} disabled={loading}>
+            <Text style={s.googleBtnText}>🔑  Continue with Google</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
             <Text style={s.link}>Don't have an account? <Text style={s.linkAccent}>Sign Up</Text></Text>
           </TouchableOpacity>
@@ -84,5 +101,10 @@ const s = StyleSheet.create({
   btn:         { backgroundColor: '#6C63FF', borderRadius: 14, padding: 18, alignItems: 'center', marginTop: 8 },
   btnText:     { color: '#fff', fontWeight: '700', fontSize: 16 },
   link:        { color: '#888', textAlign: 'center', marginTop: 16, fontSize: 14 },
-  linkAccent:  { color: '#6C63FF', fontWeight: '600' }
+  linkAccent:  { color: '#6C63FF', fontWeight: '600' },
+  dividerContainer: { flexDirection: 'row', alignItems: 'center', marginVertical: 8 },
+  dividerLine:      { flex: 1, height: 1, backgroundColor: '#1E1E2A' },
+  dividerText:      { color: '#555', paddingHorizontal: 10, fontSize: 13, fontWeight: '600' },
+  googleBtn:        { backgroundColor: '#1A1A2E', borderRadius: 14, padding: 18, alignItems: 'center', borderWidth: 1, borderColor: '#2A2A3E', marginTop: 4 },
+  googleBtnText:    { color: '#fff', fontWeight: '700', fontSize: 16 }
 })

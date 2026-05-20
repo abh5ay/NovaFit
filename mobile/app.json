@@ -22,7 +22,10 @@
     },
     "android": {
       "package": "com.novafit.app",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#0A0A0F",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -43,7 +46,8 @@
         {
           "cameraPermission": "novaFit uses the camera to scan food and estimate body fat percentage."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
