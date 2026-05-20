@@ -7,6 +7,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { chatWithCoach, ChatMessage } from '../../lib/api'
 import { logFood } from '../../lib/supabase'
+import { saveWorkoutPlan, saveMealPlan, saveScheduleConfig, savePantry } from '../../lib/useUserData'
 
 const QUICK_PROMPTS = [
   "Make my workout more intense",
@@ -25,11 +26,15 @@ export default function ChatScreen() {
   const [loading, setLoading]     = useState(false)
   const [profile, setProfile]     = useState<any>(null)
   const [scheduleConfig, setScheduleConfig] = useState<any>(null)
+  const [workoutPlan, setWorkoutPlan]       = useState<any>(null)
+  const [mealPlan, setMealPlan]             = useState<any>(null)
   const scrollRef = useRef<ScrollView>(null)
 
   useEffect(() => {
     AsyncStorage.getItem('local_profile').then(p => { if (p) setProfile(JSON.parse(p)) })
     AsyncStorage.getItem('schedule_config').then(s => { if (s) setScheduleConfig(JSON.parse(s)) })
+    AsyncStorage.getItem('workout_plan').then(w => { if (w) setWorkoutPlan(JSON.parse(w)) })
+    AsyncStorage.getItem('meal_plan').then(m => { if (m) setMealPlan(JSON.parse(m)) })
   }, [])
 
   useEffect(() => {
@@ -52,27 +57,31 @@ export default function ChatScreen() {
         profile,
         history: messages.slice(-6),
         scheduleConfig,
+        currentWorkoutPlan: workoutPlan,
+        currentMealPlan: mealPlan,
       } as any)
       const aiMsg: ChatMessage = { role: 'assistant', content: res.reply }
       setMessages([...history, aiMsg])
 
-      // Save updated plans/schedule to AsyncStorage
+      // Save updated plans/schedule to AsyncStorage AND Supabase
       if ((res as any).workoutUpdate) {
-        await AsyncStorage.setItem('workout_plan', JSON.stringify((res as any).workoutUpdate))
+        setWorkoutPlan((res as any).workoutUpdate)
+        await saveWorkoutPlan((res as any).workoutUpdate)
       }
       if ((res as any).mealUpdate) {
-        await AsyncStorage.setItem('meal_plan', JSON.stringify((res as any).mealUpdate))
+        setMealPlan((res as any).mealUpdate)
+        await saveMealPlan((res as any).mealUpdate)
       }
       if ((res as any).scheduleUpdate) {
         const newConfig = { ...(scheduleConfig || {}), ...(res as any).scheduleUpdate }
         setScheduleConfig(newConfig)
-        await AsyncStorage.setItem('schedule_config', JSON.stringify(newConfig))
+        await saveScheduleConfig(newConfig)
       }
       if ((res as any).pantryUpdate) {
         const existing = await AsyncStorage.getItem('user_pantry')
         const current  = existing ? JSON.parse(existing) : []
         const merged   = [...new Set([...current, ...(res as any).pantryUpdate])]
-        await AsyncStorage.setItem('user_pantry', JSON.stringify(merged))
+        await savePantry(merged)
       }
       if ((res as any).foodLog) {
         try {
