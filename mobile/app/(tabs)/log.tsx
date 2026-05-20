@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from 'expo-router'
 import { router } from 'expo-router'
 import { suggestFromPantry } from '../../lib/api'
+import { getTodayFoodLogs } from '../../lib/supabase'
 
 // ── Image map ──────────────────────────────────────────────
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
@@ -40,22 +41,41 @@ type TaskItem = {
 }
 
 // ── Build schedule ─────────────────────────────────────────
-function buildSchedule(workoutPlan:any, mealPlan:any, today:string, T:Times): TaskItem[] {
+function buildSchedule(workoutPlan:any, mealPlan:any, today:string, T:Times, foodLogs: any[] = []): TaskItem[] {
   const tasks: TaskItem[] = []
   tasks.push({ id:'water-am', type:'water', time:T.water_morning_time, title:'Morning Hydration', subtitle:'500ml water — start the day right', done:false, accent:'#3B82F6' })
 
   if (mealPlan?.meals) {
     mealPlan.meals.forEach((m:any, i:number) => {
+      const type = (m.type || 'lunch').toLowerCase()
+      const actualLogs = foodLogs.filter((fl: any) => (fl.meal_type || '').toLowerCase() === type)
+      
       const tKey = `${m.type}_time` as keyof Times
       const t = T[tKey] || T.lunch_time
-      tasks.push({
-        id:`meal-${i}`, type:'meal', time:t,
-        title: m.name || (m.type ? (m.type.charAt(0).toUpperCase() + m.type.slice(1)) : 'Meal'),
-        subtitle: m.ingredients?.slice(0,2).join(', ') || `${m.calories||0} kcal`,
-        calories: m.calories, done:false,
-        accent: m.type==='breakfast'?'#F59E0B':m.type==='lunch'?'#10B981':m.type==='dinner'?'#7C5CFC':'#3B82F6',
-        mealData: m,
-      })
+      
+      if (actualLogs.length > 0) {
+        // Reality: User logged what they actually ate!
+        const totalCals = actualLogs.reduce((sum: number, fl: any) => sum + (fl.calories || 0), 0)
+        const foodNames = actualLogs.map((fl: any) => fl.food_name).join(', ')
+        tasks.push({
+          id:`meal-${i}`, type:'meal', time:t,
+          title: `Logged ${m.type.charAt(0).toUpperCase() + m.type.slice(1)}`,
+          subtitle: foodNames,
+          calories: totalCals, done: true,
+          accent: m.type==='breakfast'?'#F59E0B':m.type==='lunch'?'#10B981':m.type==='dinner'?'#7C5CFC':'#3B82F6',
+          mealData: { ...m, name: foodNames, calories: totalCals, isActual: true }
+        })
+      } else {
+        // Recommendation: Show the template plan
+        tasks.push({
+          id:`meal-${i}`, type:'meal', time:t,
+          title: m.name || (m.type ? (m.type.charAt(0).toUpperCase() + m.type.slice(1)) : 'Meal'),
+          subtitle: m.ingredients?.slice(0,2).join(', ') || `${m.calories||0} kcal`,
+          calories: m.calories, done:false,
+          accent: m.type==='breakfast'?'#F59E0B':m.type==='lunch'?'#10B981':m.type==='dinner'?'#7C5CFC':'#3B82F6',
+          mealData: m,
+        })
+      }
     })
   } else {
     tasks.push(
@@ -242,7 +262,8 @@ export default function LogScreen() {
         AsyncStorage.getItem(`log_done_${today}`),
         AsyncStorage.getItem('schedule_config'),
         AsyncStorage.getItem('user_pantry'),
-      ]).then(([wp,mp,done,sc,pant]) => {
+        getTodayFoodLogs().catch(() => []),
+      ]).then(([wp,mp,done,sc,pant,foodLogs]) => {
         const workoutPlan = wp ? JSON.parse(wp) : null
         const mealPlan    = mp ? JSON.parse(mp) : null
         const doneset     = done ? new Set(JSON.parse(done)) : new Set<string>()
@@ -252,8 +273,11 @@ export default function LogScreen() {
           const tw = workoutPlan.plan.find((d:any)=>d.day?.toLowerCase()===today.toLowerCase())
           if (tw) setTodayFocus(tw.focus||'')
         }
-        let built = buildSchedule(workoutPlan, mealPlan, today, times)
-        built = built.map(t=>({...t, done: doneset.has(t.id)}))
+        let built = buildSchedule(workoutPlan, mealPlan, today, times, foodLogs)
+        built = built.map(t=>({
+          ...t,
+          done: t.done || doneset.has(t.id) // keep checked if logged or manually checked
+        }))
         setTasks(built)
         setProgress(built.filter(t=>t.done).length / Math.max(built.length,1))
       })
