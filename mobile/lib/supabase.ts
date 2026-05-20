@@ -155,7 +155,7 @@ export async function saveBodyScan(scan: { estimated_bf_pct: number; bf_range: s
 WebBrowser.maybeCompleteAuthSession()
 
 export async function signInWithGoogle() {
-  const redirectUrl = Linking.createURL('/(tabs)/home')
+  const redirectUrl = 'novafit://(tabs)/home'
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
