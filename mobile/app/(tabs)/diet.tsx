@@ -19,6 +19,7 @@ export default function DietScreen() {
   const [provider, setProvider] = useState('')
   const [targets, setTargets]   = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 })
   const [planUpdated, setPlanUpdated] = useState(false)
+  const [expandedMeal, setExpandedMeal] = useState<number | null>(null)
 
   // Load profile targets once
   useEffect(() => {
@@ -133,8 +134,14 @@ export default function DietScreen() {
         {/* Meals */}
         {plan?.meals?.map((meal, i) => {
           const color = MEAL_COLORS[meal.type] || '#7C5CFC'
+          const isExpanded = expandedMeal === i
           return (
-            <View key={i} style={s.mealCard}>
+            <TouchableOpacity
+              key={i}
+              activeOpacity={0.95}
+              onPress={() => setExpandedMeal(isExpanded ? null : i)}
+              style={s.mealCard}
+            >
               <View style={s.mealHeader}>
                 <View style={[s.mealTag, { backgroundColor: color + '22', borderColor: color + '55' }]}>
                   <Text style={[s.mealTagText, { color }]}>{meal.type?.toUpperCase()}</Text>
@@ -148,14 +155,42 @@ export default function DietScreen() {
                 <Text style={s.macroChip}>F {Math.round(meal.fat)}g</Text>
                 {meal.prep_time_min && <Text style={s.macroChip}>{meal.prep_time_min} min</Text>}
               </View>
+
+              {/* Ingredients */}
               {meal.ingredients?.length > 0 && (
                 <View style={s.ingredients}>
+                  <Text style={s.sectionHeader}>Ingredients</Text>
                   {meal.ingredients.map((ing, j) => (
                     <Text key={j} style={s.ingredient}>· {ing}</Text>
                   ))}
                 </View>
               )}
-            </View>
+
+              {/* Cooking Instructions (collapsible step-by-step list) */}
+              {isExpanded && (
+                <View style={s.recipeSection}>
+                  <Text style={s.sectionHeader}>Preparation Steps</Text>
+                  {meal.instructions && meal.instructions.length > 0 ? (
+                    meal.instructions.map((step, k) => (
+                      <View key={k} style={s.stepRow}>
+                        <View style={[s.stepNumBadge, { backgroundColor: color + '22', borderColor: color + '44' }]}>
+                          <Text style={[s.stepNumText, { color }]}>{k + 1}</Text>
+                        </View>
+                        <Text style={s.stepText}>{step}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={s.noRecipeText}>Ask AI Coach in Chat to get the quick cooking instructions for this meal! 🍳</Text>
+                  )}
+                </View>
+              )}
+
+              <View style={[s.expandBadge, { borderColor: color + '22' }]}>
+                <Text style={[s.expandText, { color }]}>
+                  {isExpanded ? '▲ Hide Cooking Steps' : '▼ Show Cooking Steps & Recipe'}
+                </Text>
+              </View>
+            </TouchableOpacity>
           )
         })}
 
@@ -216,8 +251,17 @@ const s = StyleSheet.create({
   mealName:      { color: '#fff', fontSize: 16, fontWeight: '700' },
   macroChips:    { flexDirection: 'row', gap: 8 },
   macroChip:     { backgroundColor: '#1A1A2E', color: '#999', fontSize: 11, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
-  ingredients:   { gap: 3, paddingTop: 4, borderTopWidth: 1, borderTopColor: '#1E1E2A' },
-  ingredient:    { color: '#666', fontSize: 12 },
+  ingredients:   { gap: 3, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#1E1E2A' },
+  sectionHeader: { color: '#888', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+  ingredient:    { color: '#aaa', fontSize: 13, lineHeight: 18 },
+  recipeSection: { gap: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#1E1E2A', marginTop: 4 },
+  stepRow:       { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
+  stepNumBadge:  { width: 22, height: 22, borderRadius: 11, borderWidth: 1, justifyContent: 'center', alignItems: 'center', marginTop: 1 },
+  stepNumText:   { fontSize: 11, fontWeight: '800' },
+  stepText:      { color: '#ccc', fontSize: 13, flex: 1, lineHeight: 18 },
+  noRecipeText:  { color: '#888', fontSize: 12, fontStyle: 'italic', lineHeight: 18 },
+  expandBadge:   { alignSelf: 'center', borderTopWidth: 1, width: '100%', pt: 8, marginTop: 8, alignItems: 'center', paddingTop: 8 },
+  expandText:    { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   totalsCard:    { backgroundColor: '#111118', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#7C5CFC33' },
   totalsTitle:   { color: '#7C5CFC', fontSize: 13, fontWeight: '700', marginBottom: 12, letterSpacing: 0.5, textTransform: 'uppercase' },
   totalsRow:     { flexDirection: 'row', justifyContent: 'space-between' },

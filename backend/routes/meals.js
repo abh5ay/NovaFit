@@ -42,9 +42,10 @@ ${mealsList}
 
 Adjust ONLY these remaining meals to fit the remaining budget. Keep the same meal types (${remaining_meals.map(m=>m.type).join(', ')}).
 Make smart, realistic substitutions. Keep meals healthy and satisfying.
+For EACH meal, include brief cooking/prep step-by-step instructions.
 
 Return ONLY valid JSON array (no markdown):
-[{"type":"lunch","name":"Grilled Chicken Salad","calories":450,"protein":40,"carbs":30,"fat":15,"ingredients":["200g chicken breast","2 cups mixed greens","1 tbsp olive oil","lemon"],"prep_time_min":15}]`
+[{"type":"lunch","name":"Grilled Chicken Salad","calories":450,"protein":40,"carbs":30,"fat":15,"ingredients":["200g chicken breast","2 cups mixed greens","1 tbsp olive oil","lemon"],"instructions":["Season and grill chicken breast","Slice chicken and toss with greens","Drizzle with olive oil and lemon juice"],"prep_time_min":15}]`
 
     const { text, provider } = await generateText(prompt, TEXT_MODELS)
     const adjusted = JSON.parse(text.match(/\[[\s\S]*\]/)?.[0] || '[]')

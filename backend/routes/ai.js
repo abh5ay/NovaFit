@@ -55,8 +55,9 @@ router.post('/meal-plan', async (req, res) => {
 Targets: ${safeCal} kcal | Protein: ${protein}g | Carbs: ${carbs}g | Fat: ${fat}g
 Dietary restrictions: ${restrictions || 'none'}
 Include 3 main meals and 1-2 snacks. Use real, accessible foods.
+For EACH meal, include brief cooking/prep step-by-step instructions.
 Return ONLY valid JSON:
-{"meals":[{"type":"breakfast","name":"Oats with berries","calories":380,"protein":15,"carbs":60,"fat":8,"ingredients":["1 cup rolled oats","1 cup mixed berries","1 tbsp honey"],"prep_time_min":5}],"daily_totals":{"calories":0,"protein":0,"carbs":0,"fat":0}}`
+{"meals":[{"type":"breakfast","name":"Oats with berries","calories":380,"protein":15,"carbs":60,"fat":8,"ingredients":["1 cup rolled oats","1 cup mixed berries","1 tbsp honey"],"instructions":["Boil rolled oats in milk or water","Top with fresh berries","Drizzle with honey"],"prep_time_min":5}],"daily_totals":{"calories":0,"protein":0,"carbs":0,"fat":0}}`
 
     const { text, provider } = await generateText(prompt, TEXT_MODELS)
     const json = extractJSON(text)
