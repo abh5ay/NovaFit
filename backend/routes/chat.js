@@ -95,6 +95,19 @@ SCHEDULE UPDATE — when user mentions wake up time, sleep time, meal timing, wo
 }
 </schedule_update>
 
+FOOD LOGGING — when user reports eating, consuming, or logging a meal/food (e.g., "I had 4 eggs and 2 bread for breakfast", "Ate a bowl of oats"):
+<food_log>
+{
+  "food_name": "4 eggs and 2 slices of bread",
+  "meal_type": "breakfast",
+  "calories": 420,
+  "protein": 30,
+  "carbs": 24,
+  "fat": 20,
+  "confidence": "high"
+}
+</food_log>
+
 EXAMPLES THAT REQUIRE JSON UPDATES:
 - "I wake up at 9am" → generate <schedule_update> with all times shifted accordingly
 - "change to X days workout" → generate <plan_update> with exactly X days
@@ -102,6 +115,7 @@ EXAMPLES THAT REQUIRE JSON UPDATES:
 - "add more protein" → generate <meal_update> with adjusted macros
 - "I sleep at midnight" → generate <schedule_update> with shifted times
 - "workout in the morning" → generate <schedule_update> with workout_time set to morning
+- "I had 4 eggs and 2 bread for breakfast" → generate <food_log> with exact nutrient estimation for 4 eggs and 2 slices of bread, set meal_type to breakfast
 
 For PURE questions (no changes), answer conversationally in 1-3 sentences.
 Be motivating, specific, and never say "I'll update it" without ACTUALLY producing the JSON.`
@@ -151,7 +165,16 @@ Be motivating, specific, and never say "I'll update it" without ACTUALLY produci
       } catch { /* keep reply as-is */ }
     }
 
-    res.json({ reply, workoutUpdate, mealUpdate, scheduleUpdate, pantryUpdate, _provider: provider })
+    let foodLog = null
+    const foodMatch = text.match(/<food_log>([\s\S]*?)<\/food_log>/)
+    if (foodMatch) {
+      try {
+        foodLog = JSON.parse(foodMatch[1].trim())
+        reply = reply.replace(/<food_log>[\s\S]*?<\/food_log>/, '').trim()
+      } catch { /* keep reply as-is */ }
+    }
+
+    res.json({ reply, workoutUpdate, mealUpdate, scheduleUpdate, pantryUpdate, foodLog, _provider: provider })
   } catch (err) {
     console.error('[/chat]', err.message)
     res.status(503).json({ error: 'AI Coach unavailable. Please try again.', detail: err.message })

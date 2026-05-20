@@ -6,6 +6,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { chatWithCoach, ChatMessage } from '../../lib/api'
+import { logFood } from '../../lib/supabase'
 
 const QUICK_PROMPTS = [
   "Make my workout more intense",
@@ -72,6 +73,13 @@ export default function ChatScreen() {
         const current  = existing ? JSON.parse(existing) : []
         const merged   = [...new Set([...current, ...(res as any).pantryUpdate])]
         await AsyncStorage.setItem('user_pantry', JSON.stringify(merged))
+      }
+      if ((res as any).foodLog) {
+        try {
+          await logFood((res as any).foodLog)
+        } catch (err) {
+          console.error('Failed to auto-log food from chat:', err)
+        }
       }
     } catch (e: any) {
       setMessages([...history, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again in a moment." }])
