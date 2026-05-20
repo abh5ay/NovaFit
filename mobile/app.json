@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "novaFit",
+    "slug": "novafit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.novafit.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "novaFit uses the camera to scan food and analyze body composition.",
+        "NSPhotoLibraryUsageDescription": "novaFit needs photo access to analyze food and body photos from your gallery.",
+        "NSMicrophoneUsageDescription": "Microphone access is required for camera use."
+      }
+    },
+    "android": {
+      "package": "com.novafit.app",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0F",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "novafit",
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "novaFit uses the camera to scan food and estimate body fat percentage."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
