@@ -17,18 +17,23 @@ export default function SignupScreen() {
     if (!name || !email || !password) return Alert.alert('Error', 'Please fill all fields')
     if (password.length < 6) return Alert.alert('Error', 'Password must be at least 6 characters')
     setLoading(true)
-    const { data, error } = await signUp(email.trim(), password, name.trim())
-    setLoading(false)
-    if (error) {
-      Alert.alert('Signup Failed', error.message)
-    } else if (data && !data.session) {
-      Alert.alert(
-        'Confirm Your Email 📧',
-        'We sent a verification link to your email. Please click it to complete registration, then log in!'
-      )
-      router.replace('/(auth)/login')
-    } else {
-      router.replace('/(auth)/onboarding/step1-goal')
+    try {
+      const { data, error } = await signUp(email.trim(), password, name.trim())
+      if (error) {
+        Alert.alert('Signup Failed', error.message)
+      } else if (data && !data.session) {
+        Alert.alert(
+          'Confirm Your Email 📧',
+          'We sent a verification link to your email. Please click it to complete registration, then log in!'
+        )
+        router.replace('/(auth)/login')
+      } else {
+        router.replace('/(auth)/onboarding/step1-goal')
+      }
+    } catch (e: any) {
+      Alert.alert('Error connecting to Server', e.message || 'An unexpected connection error occurred.')
+    } finally {
+      setLoading(false)
     }
   }
 

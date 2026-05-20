@@ -15,17 +15,27 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (!email || !password) return Alert.alert('Error', 'Please enter email and password')
     setLoading(true)
-    const { error } = await signIn(email.trim(), password)
-    setLoading(false)
-    if (error) Alert.alert('Login Failed', error.message)
-    else router.replace('/(tabs)/home')
+    try {
+      const { error } = await signIn(email.trim(), password)
+      if (error) Alert.alert('Login Failed', error.message)
+      else router.replace('/(tabs)/home')
+    } catch (e: any) {
+      Alert.alert('Error connecting to Server', e.message || 'An unexpected connection error occurred.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    const { error } = await signInWithGoogle()
-    setLoading(false)
-    if (error) Alert.alert('Google Sign-In Failed', error.message)
+    try {
+      const { error } = await signInWithGoogle()
+      if (error) Alert.alert('Google Sign-In Failed', error.message)
+    } catch (e: any) {
+      Alert.alert('Google Sign-In Failed', e.message || 'An unexpected connection error occurred.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
