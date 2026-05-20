@@ -8,9 +8,9 @@ const { generateText, extractJSON } = require('./aiRouter')
 const LIMITS  = require('../middleware/safety')
 
 const TEXT_MODELS = {
-  groqModel:       'llama-3.3-70b-versatile',
-  nvidiaModel:     'meta/llama-3.1-70b-instruct',
-  openrouterModel: 'meta-llama/llama-3.1-70b-instruct:free',
+  groqModel:       'llama-3.1-8b-instant',
+  nvidiaModel:     'meta/llama-3.1-8b-instruct',
+  openrouterModel: 'meta-llama/llama-3.1-8b-instruct:free',
   hfModel:         'mistralai/Mistral-7B-Instruct-v0.2'
 }
 
